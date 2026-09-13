@@ -3,18 +3,60 @@ import pandas as pd
 
 
 # ============================================================
+# PROJECT PATH
+# ============================================================
+
+BASE_DIR = os.path.dirname(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    )
+)
+
+
+# ============================================================
 # FILE PATHS
 # ============================================================
 
-FORECAST_PATH = "data/processed/forecast.csv"
-SHAP_PATH = "data/processed/shap_explanation.csv"
+PROCESSED_DIR = os.path.join(
+    BASE_DIR,
+    "data",
+    "processed"
+)
+
+FORECAST_PATH = os.path.join(
+    PROCESSED_DIR,
+    "forecast.csv"
+)
+
+SHAP_PATH = os.path.join(
+    PROCESSED_DIR,
+    "shap_explanation.csv"
+)
 
 SALES_PATH = os.getenv(
     "DATA_PATH",
-    "data/processed/rossmann_merged.csv"
+    os.path.join(
+        PROCESSED_DIR,
+        "rossmann_merged.csv"
+    )
 )
 
-OUTPUT_PATH = "data/processed/intelligence.csv"
+if not os.path.isabs(SALES_PATH):
+
+    SALES_PATH = os.path.join(
+        BASE_DIR,
+        SALES_PATH
+    )
+
+OUTPUT_PATH = os.path.join(
+    PROCESSED_DIR,
+    "intelligence.csv"
+)
+
+os.makedirs(
+    PROCESSED_DIR,
+    exist_ok=True
+)
 
 
 # ============================================================
@@ -24,6 +66,18 @@ OUTPUT_PATH = "data/processed/intelligence.csv"
 print("==========================================")
 print("LOADING DATA")
 print("==========================================")
+
+print(
+    f"Forecast path: {FORECAST_PATH}"
+)
+
+print(
+    f"SHAP path: {SHAP_PATH}"
+)
+
+print(
+    f"Sales path: {SALES_PATH}"
+)
 
 forecast = pd.read_csv(
     FORECAST_PATH
