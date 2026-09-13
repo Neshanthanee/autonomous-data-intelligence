@@ -98,16 +98,40 @@ sales = pd.read_csv(
 # DATE CONVERSION
 # ============================================================
 
-forecast["Date"] = pd.to_datetime(
-    forecast["Date"],
-    format="%Y-%m-%d"
+def parse_dates(series):
+
+    values = series.astype(str).str.strip()
+
+    dates = pd.Series(
+        pd.NaT,
+        index=series.index,
+        dtype="datetime64[ns]"
+    )
+
+    iso_mask = values.str.match(
+        r"^\d{4}-\d{2}-\d{2}$"
+    )
+
+    dates.loc[iso_mask] = pd.to_datetime(
+        values.loc[iso_mask],
+        format="%Y-%m-%d"
+    )
+
+    dates.loc[~iso_mask] = pd.to_datetime(
+        values.loc[~iso_mask],
+        format="%d-%m-%Y"
+    )
+
+    return dates
+
+
+forecast["Date"] = parse_dates(
+    forecast["Date"]
 )
 
-sales["Date"] = pd.to_datetime(
-    sales["Date"],
-    format="%d-%m-%Y"
+sales["Date"] = parse_dates(
+    sales["Date"]
 )
-
 
 print(
     f"Forecast records: {len(forecast)}"
