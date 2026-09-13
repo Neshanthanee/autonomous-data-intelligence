@@ -79,6 +79,43 @@ SHAP_PATH = os.path.join(
 
 
 # ============================================================
+# RUN PIPELINE SCRIPT
+# ============================================================
+
+def run_pipeline_script(script_name, pipeline_env):
+
+    script_path = os.path.join(
+        BASE_DIR,
+        "models",
+        script_name
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            script_path
+        ],
+        env=pipeline_env,
+        cwd=BASE_DIR,
+        text=True,
+        capture_output=True
+    )
+
+    if result.stdout:
+        print(result.stdout)
+
+    if result.stderr:
+        print(result.stderr)
+
+    if result.returncode != 0:
+
+        raise RuntimeError(
+            f"{script_name} failed with exit code "
+            f"{result.returncode}"
+        )
+
+
+# ============================================================
 # RUN MACHINE LEARNING PIPELINE
 # ============================================================
 
@@ -100,9 +137,6 @@ def run_pipeline():
     )
 
 
-    # Environment variables passed
-    # to the individual pipeline scripts.
-
     pipeline_env = os.environ.copy()
 
     pipeline_env["DATA_PATH"] = DATA_PATH
@@ -116,18 +150,9 @@ def run_pipeline():
     print()
     print("Running forecast...")
 
-    subprocess.run(
-        [
-            sys.executable,
-            os.path.join(
-                BASE_DIR,
-                "models",
-                "forecast.py"
-            )
-        ],
-        env=pipeline_env,
-        cwd=BASE_DIR,
-        check=True
+    run_pipeline_script(
+        "forecast.py",
+        pipeline_env
     )
 
 
@@ -138,18 +163,9 @@ def run_pipeline():
     print()
     print("Running XAI...")
 
-    subprocess.run(
-        [
-            sys.executable,
-            os.path.join(
-                BASE_DIR,
-                "models",
-                "xai.py"
-            )
-        ],
-        env=pipeline_env,
-        cwd=BASE_DIR,
-        check=True
+    run_pipeline_script(
+        "xai.py",
+        pipeline_env
     )
 
 
@@ -160,18 +176,9 @@ def run_pipeline():
     print()
     print("Running intelligence...")
 
-    subprocess.run(
-        [
-            sys.executable,
-            os.path.join(
-                BASE_DIR,
-                "models",
-                "intelligence.py"
-            )
-        ],
-        env=pipeline_env,
-        cwd=BASE_DIR,
-        check=True
+    run_pipeline_script(
+        "intelligence.py",
+        pipeline_env
     )
 
 
@@ -193,7 +200,6 @@ async def lifespan(app: FastAPI):
     print("APPLICATION STARTUP")
     print("==========================================")
 
-
     try:
 
         run_pipeline()
@@ -206,7 +212,6 @@ async def lifespan(app: FastAPI):
         print("==========================================")
 
         print(error)
-
 
     yield
 
