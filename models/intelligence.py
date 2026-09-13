@@ -100,12 +100,12 @@ sales = pd.read_csv(
 
 forecast["Date"] = pd.to_datetime(
     forecast["Date"],
-    format="ISO8601"
+    format="%Y-%m-%d"
 )
 
 sales["Date"] = pd.to_datetime(
     sales["Date"],
-    format="ISO8601"
+    format="%d-%m-%Y"
 )
 
 
